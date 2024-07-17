@@ -1,4 +1,4 @@
-class HashMap {
+export default class HashMap {
     constructor (sizeBucketsArr = 16){
         this.bucketsArr = new Array (sizeBucketsArr); // Arrays, in denen die Schlüssel/Wert-Paare basierend auf ihren Hash-Code gespeichert werden
         this.size = 0; // Anzahl der gespeicherten Schlüssel/Wert-Paare
@@ -12,7 +12,7 @@ class HashMap {
     }
 
     // Nimmt einen Key und produziert daraus einen Hash Code
-    hash (key){
+    hash(key){
         let hashCode = 0;
 
         const primeNumber = 31;
@@ -24,7 +24,7 @@ class HashMap {
     }
 
     // Eintrag in die HashMap hinzuzufügen
-    set (key, value){
+    set(key, value){
         const index = this.hash(key); // Hash Code von den übergebenen Key wird produziert -> gleichzeitig wird dadruch der Index für die Bucketposition im Array bestimmt
         this.checkIndex(index); // Index muss auf Gültigkeit überprüft werden
 
@@ -52,7 +52,7 @@ class HashMap {
     }
 
     // Vergrößert die HashMap um den Load-Factor zu verkleinern + Kollisionen zu minimieren
-    resize (){
+    resize(){
         const oldBucketsArr = this.bucketsArr; // Speichert das aktuelle BucketArray
         this.bucketsArr = new Array(oldBucketsArr.length * 2); // neues BucketArray mit 2x größer als vorher
         this.size = 0;
@@ -66,6 +66,7 @@ class HashMap {
         }
     }
 
+    // Nimmt den Key und gibt den Wert des zugehörigen Keys wieder || Wenn es den Key nicht gibt -> wird null zurückgegeben
     get(key){
         const index = this.hash(key); // Index, um den entsprechenden Bucket zu finden
         this.checkIndex(index);
@@ -82,15 +83,69 @@ class HashMap {
         return null;
     }
 
-   
+    // Überprüft ob der Key in der HashMap vorhanden ist 
+    has(key){
+        const index = this.hash(key);
+        this.checkIndex(index);
 
+        if (!this.bucketsArr[index]){
+            return false;
+        }
+        
+        for (let i = 0; i < this.bucketsArr[index].length; i++){
+            if (key === this.bucketsArr[index][i].key){
+                return true;
+            }
+        }
 
+        return false;
+    }
+
+    // Löscht den Eintrag mithilfe des übergebenen Key
+    remove(key){
+    const index = this.hash(key);
+    this.checkIndex(index);
+
+    if (!this.bucketsArr[index]){
+        return false;
+    }
+ 
+    for (let i = 0; i < this.bucketsArr[index].length; i++){
+        if (key === this.bucketsArr[index][i].key){
+            this.bucketsArr[index].splice(i, 1); // Ab den Index i genau ein Element gelöscht
+            this.size--; // Die aktuelle größ der Einträge zu aktualisiern
+            return true;
+        }
+    }
+
+    return false;
+   }
+
+   // Gibt die Anzahl der gespeicherten Keys in der HashMap
+   length(){
+    return this.size;
+   }
+
+   // Entfernt alle Einträge in der HashMap
+   clear(){
+    this.bucketsArr = new Array(this.bucketsArr.length); // Neues Array
+    this.size = 0; // Zurücksetzen der Größe
+   }
+
+   // Gibt einen Array zurück, das alle Keys der HashMap enthält
+   keys(){
+    let keysArr = []; // Sammel Array 
+
+    for (let i = 0; i < this.bucketsArr.length; i++){ // Iterriert durch das Array mit Buckets
+        if (this.bucketsArr[i] && Array.isArray(this.bucketsArr[i])){ // Überprüfung, ob der Bucket existiert und ein Array ist
+            for (let j = 0; j < this.bucketsArr[i].length; j++){ // Iterriert durch den Bucket
+                if (this.bucketsArr[i][j] && this.bucketsArr[i][j].key){ // Überprüft, ob ein gültiges Element sowie anschlie0end gültiger Key existiert
+                    keysArr.push(this.bucketsArr[i][j].key) // Der Key wird in das Sammel Array hinzugefügt
+                }
+            }
+        }
+    }
+
+    return keysArr;
+   }
 }
-
-const map = new HashMap (16);
-
-map.set("moin", "hello");
-map.set("carla", "world");
-map.set("carlos", "everyone");
-
-console.log(map.get("moin"));
