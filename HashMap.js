@@ -57,7 +57,7 @@ export default class HashMap {
         this.bucketsArr = new Array(oldBucketsArr.length * 2); // neues BucketArray mit 2x größer als vorher
         this.size = 0;
 
-        for (const bucket of oldbucketsArr){
+        for (const bucket of oldBucketsArr){
             if (bucket){ // Leere bucketsArr werden übersprungen
                 for (const entry of bucket){ // Iterriert über jedes Element im Bucket
                     this.set(entry.key, entry.value); // Fügt jeden Eintrag in das neue BucketArray
@@ -147,5 +147,40 @@ export default class HashMap {
     }
 
     return keysArr;
+   }
+
+
+   // Gibt einen Array zurück, das alle Werte der HashMap enthält
+   values(){
+    let valuesArr = [];
+
+    for (let i = 0; i < this.bucketsArr.length; i++){
+        if (this.bucketsArr[i] && Array.isArray(this.bucketsArr[i])){
+            for (let j = 0; j < this.bucketsArr[i].length; j++){
+                if (this.bucketsArr[i][j] && this.bucketsArr[i][j].value !== undefined){
+                    valuesArr.push(this.bucketsArr[i][j].value);
+                }
+            }
+        }
+    }
+
+    return valuesArr
+   }
+
+   // Gibt einen Array zurück, das alle Keys mit dem entprechenden Werten der HashMap enthält
+   entries(){
+    let entriesArr = [];
+
+    for (let i = 0; i < this.bucketsArr.length; i++){
+        if (this.bucketsArr[i] && Array.isArray(this.bucketsArr[i])){
+            for (let j = 0; j < this.bucketsArr[i].length; j++){
+                if (this.bucketsArr[i][j] && this.bucketsArr[i][j].value !== undefined && this.bucketsArr[i][j].key !== undefined){
+                    entriesArr.push([this.bucketsArr[i][j].key, this.bucketsArr[i][j].value]);
+                }
+            }
+        }
+    }
+
+    return entriesArr;
    }
 }
