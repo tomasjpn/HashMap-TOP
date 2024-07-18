@@ -23,6 +23,17 @@ export default class HashMap {
         return hashCode;
     }
 
+    // Findet den Eintrag im Bucket mit dem angegebenen Schlüssel
+    findEntry(bucket, key){
+        for (let i = 0; i < bucket.length; i++){
+            if (key === bucket[i].key){
+                return bucket[i];
+            }
+        }
+
+        return null;
+    }
+
     // Eintrag in die HashMap hinzuzufügen
     set(key, value){
         const index = this.hash(key); // Hash Code von den übergebenen Key wird produziert -> gleichzeitig wird dadruch der Index für die Bucketposition im Array bestimmt
@@ -34,11 +45,11 @@ export default class HashMap {
         }
 
         // Iterriert durch die bucketsArr
-        for (let i = 0; i < this.bucketsArr[index].length; i++){
-            if (this.bucketsArr[index][i].key === key){ // wenn der übergebene Key an dem Bucket vorhanden ist, wird der alte Inhalt mit dem neuen Inhalt des selben Keys überschrieben
-                this.bucketsArr[index][i].value = value;
-                return;
-            }
+
+        const existingEntry = this.findEntry(this.bucketsArr[index], key);
+        if (existingEntry) {
+            existingEntry.value = value; // wenn der übergebene Key an dem Bucket vorhanden ist, wird der alte Inhalt mit dem neuen Inhalt des selben Keys überschrieben
+            return;
         }
 
         // Ansonsten wird ein neuer Eintrag mit Key und Value an dem entsprechenden Index hinzugefügt
@@ -74,13 +85,9 @@ export default class HashMap {
         if (!this.bucketsArr[index]){ // Überprüfung, ob es an der Indexposition einen Bucket gibt -> null = gesuchter Schlüssel ist nicht in der HashMap vorhanden
             return null;
         }
-        for (let i = 0; i < this.bucketsArr[index].length; i++){
-            if (key === this.bucketsArr[index][i].key){
-                return this.bucketsArr[index][i].value;
-            }
-        }
 
-        return null;
+        const entry = this.findEntry(this.bucketsArr[index], key);
+        return entry ? entry.value : null;
     }
 
     // Überprüft ob der Key in der HashMap vorhanden ist 
@@ -91,14 +98,8 @@ export default class HashMap {
         if (!this.bucketsArr[index]){
             return false;
         }
-        
-        for (let i = 0; i < this.bucketsArr[index].length; i++){
-            if (key === this.bucketsArr[index][i].key){
-                return true;
-            }
-        }
 
-        return false;
+        return !!this.findEntry(this.bucketsArr[index], key)
     }
 
     // Löscht den Eintrag mithilfe des übergebenen Key
@@ -110,12 +111,12 @@ export default class HashMap {
         return false;
     }
  
-    for (let i = 0; i < this.bucketsArr[index].length; i++){
-        if (key === this.bucketsArr[index][i].key){
-            this.bucketsArr[index].splice(i, 1); // Ab den Index i genau ein Element gelöscht
-            this.size--; // Die aktuelle größ der Einträge zu aktualisiern
-            return true;
-        }
+    const entryData = this.findEntry(this.bucketsArr[index], key);
+    if (entryData){
+        this.bucketsArr[index].splice(entryData.index, 1); // Ab den Index i genau ein Element gelöscht
+        this.size--; // Die aktuelle größ der Einträge zu aktualisiern
+        return true;
+
     }
 
     return false;
